@@ -1,0 +1,47 @@
+<!-- Firebase Dynamic List Widget -->
+<!-- Минимальный вариант - копируй и вставь -->
+
+<div id="firebase-list" style="max-width: 400px; margin: 20px 0; font-family: Arial;">
+  <input id="fbInput" type="text" placeholder="Новая задача..." 
+    style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;"
+    onkeypress="if(event.key==='Enter')fbAdd()">
+  <button onclick="fbAdd()" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer;">Добавить</button>
+  <div id="fbList" style="margin-top: 15px;"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyDx76_mQHM7EJCLhRA0sUpPj9Y0WqXNIeU",
+  authDomain: "server-70049.firebaseapp.com",
+  databaseURL: "https://server-70049-default-rtdb.firebaseio.com",
+  projectId: "server-70049"
+});
+
+const db = firebase.database();
+
+db.ref('items').on('value', snapshot => {
+  const list = document.getElementById('fbList');
+  list.innerHTML = '';
+  const items = [];
+  snapshot.forEach(child => items.push({key: child.key, data: child.val()}));
+  items.reverse().forEach(({key, data}) => {
+    const item = document.createElement('div');
+    item.style.cssText = 'padding: 10px; background: #f0f0f0; margin: 8px 0; border-radius: 4px; display: flex; justify-content: space-between;';
+    item.innerHTML = `
+      <span>${data.name}</span>
+      <button onclick="db.ref('items/${key}').remove()" style="background: #dc3545; color: white; border: none; padding: 4px 8px; cursor: pointer;">Удалить</button>
+    `;
+    list.appendChild(item);
+  });
+});
+
+function fbAdd() {
+  const val = document.getElementById('fbInput').value.trim();
+  if (val) {
+    db.ref('items').push({name: val, timestamp: new Date().toISOString()});
+    document.getElementById('fbInput').value = '';
+  }
+}
+</script>
