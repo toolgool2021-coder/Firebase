@@ -29,10 +29,17 @@ db.ref('items').on('value', snapshot => {
   items.reverse().forEach(({key, data}) => {
     const item = document.createElement('div');
     item.style.cssText = 'padding: 10px; background: #f0f0f0; margin: 8px 0; border-radius: 4px; display: flex; justify-content: space-between;';
-    item.innerHTML = `
-      <span>${data.name}</span>
-      <button onclick="db.ref('items/${key}').remove()" style="background: #dc3545; color: white; border: none; padding: 4px 8px; cursor: pointer;">Удалить</button>
-    `;
+    
+    const btn = document.createElement('button');
+    btn.textContent = 'Удалить';
+    btn.style.cssText = 'background: #dc3545; color: white; border: none; padding: 4px 8px; cursor: pointer;';
+    btn.onclick = function() { db.ref('items/' + key).remove(); };
+    
+    const span = document.createElement('span');
+    span.textContent = data.name;
+    
+    item.appendChild(span);
+    item.appendChild(btn);
     list.appendChild(item);
   });
 });
